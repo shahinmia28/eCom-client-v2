@@ -30,8 +30,22 @@ import CartPage from './pages/CartPage';
 import AllProductPage from './pages/AllProductPage';
 import CreateHeroImg from './pages/admin/CreateHeroImg';
 import DeliveryCharge from './pages/admin/DeliveryCharge';
+import Trust from './components/Trust';
+import GoTop from './components/GoTop';
+import { useEffect } from 'react';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 function App() {
+  useEffect(() => {
+    AOS.init({
+      offset: 10,
+      duration: 1000,
+      easing: 'ease-in-sine',
+      delay: 50,
+    });
+  }, []);
+
   return (
     <BrowserRouter>
       <Header />
@@ -72,8 +86,10 @@ function App() {
         <Route path='/policy' element={<Policy />} />
         <Route path='/*' element={<PageNotFound />} />
       </Routes>
+      <Trust />
       <Toaster />
       <Footer />
+      <GoTop />
     </BrowserRouter>
   );
 }

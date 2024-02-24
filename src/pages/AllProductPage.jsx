@@ -33,6 +33,7 @@ const AllProductPage = () => {
         <h2>Best Offer -- Purchases Now</h2>
         <hr />
         <ProductList />
+        <div className='py-4'></div>
       </div>
     </>
   );

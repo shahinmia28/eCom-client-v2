@@ -8,15 +8,19 @@ import Amount from '../components/Amount';
 import { useCartContext } from '../context/cartContext';
 import ProductPrice from '../components/ProductPrice';
 import toast from 'react-hot-toast';
-import { Empty } from 'antd';
+import { useAuth } from '../context/authContext';
+import Star from '../components/Star';
 
 const ProductDetails = () => {
+  const [auth] = useAuth();
   const params = useParams();
   const navigate = useNavigate();
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [mainImg, setMainImg] = useState('');
   const { addToCart } = useCartContext();
   const [amount, setAmount] = useState(1);
+  const [rating, setRating] = useState('');
+  const [comment, setComment] = useState('');
 
   const setDecrement = () => {
     amount > 1 ? setAmount(amount - 1) : setAmount(1);
@@ -28,6 +32,7 @@ const ProductDetails = () => {
   };
 
   const [product, setProduct] = useState({});
+  // console.log(product);
   //getProduct
   const getProduct = async () => {
     try {
@@ -40,7 +45,6 @@ const ProductDetails = () => {
       console.log(error);
     }
   };
-
   //get similar product
   const getSimilarProduct = async (pid, cid) => {
     try {
@@ -52,11 +56,52 @@ const ProductDetails = () => {
       console.log(error);
     }
   };
+  // review handleReview
+  const handleReview = async (e) => {
+    e.preventDefault();
+    const { data } = await axios.post(
+      `${API}/api/product/review/${product._id}`,
+      {
+        user: auth.user.name,
+        rating,
+        comment,
+      }
+    );
+    if (data?.success) {
+      toast.success(data?.message);
+      getProduct();
+    }
+  };
+  let totalRating;
+
+  if (product?.reviews?.length !== 0) {
+    totalRating = product?.reviews
+      ?.map((curElem) => curElem.rating)
+      .reduce((a, b) => a + b);
+  }
+
+  const totalReviews = product?.reviews?.length;
+  const stars = totalRating / totalReviews;
+
+  // delete review only for admin
+
+  const handleDeleteReviews = async (comment_id) => {
+    const product_id = product?._id;
+    const { data } = await axios.post(`${API}/api/product/delete_review`, {
+      comment_id,
+      product_id,
+    });
+    if (data?.success) {
+      toast.success(data?.message);
+      getProduct();
+    }
+  };
 
   //initial details
   useEffect(() => {
     if (params?.slug) getProduct();
   }, [params?.slug]);
+
   //initial main ing
   useEffect(() => {
     if (product.images) {
@@ -87,6 +132,13 @@ const ProductDetails = () => {
             </div>
             <div className='col-md-6 product-info'>
               <h3 className='title'> {product?.name}</h3>
+              <div className='review-wrap'>
+                <Star stars={stars} />
+                <span className='totalReviews'>
+                  ({totalReviews} customer reviews)
+                </span>
+              </div>
+
               <div className='price-section'>
                 <h6 className='price-title'>Deal Of The Day: </h6>
                 <ProductPrice
@@ -95,6 +147,7 @@ const ProductDetails = () => {
                   sell_price={product?.sell_price}
                 />
               </div>
+
               <hr />
               <p className='text-muted'>{product?.description}</p>
               <h6 className='category'>
@@ -142,6 +195,70 @@ const ProductDetails = () => {
                   ADD TO CART
                 </button>
               </div>
+            </div>
+          </div>
+          <hr />
+          {/* rete this product section */}
+          <div className='review'>
+            <div className='container'>
+              <div className='form-wrap '>
+                <form className='form p-3 m-3 bg-info'>
+                  <h3>Review Product</h3>
+                  <input
+                    type='number'
+                    className='form-control my-3'
+                    placeholder='Rate the product'
+                    onChange={(e) => setRating(e.target.value)}
+                  />
+                  <textarea
+                    name='review'
+                    rows='5'
+                    className='form-control my-3'
+                    placeholder='Write Review'
+                    onChange={(e) => setComment(e.target.value)}
+                  ></textarea>
+                  <button
+                    type='submit'
+                    className='btn btn-light'
+                    onClick={(e) => handleReview(e)}
+                  >
+                    Submit
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {/* Show review section */}
+          <div className='show-review'>
+            <div className='wrap'>
+              {product?.reviews?.length !== 0 ? (
+                <>
+                  {product?.reviews?.map((curReview, i) => {
+                    return (
+                      <div key={i} className='review-section card my-2 p-3'>
+                        <h6 className='user'>User Name: {curReview.user}</h6>
+                        <div className='rating d-flex align-items-center'>
+                          <span className='r-t me-2'>Rating: </span>
+                          <Star stars={curReview.rating} />
+                        </div>
+                        <p className='comment'>Comment: {curReview.comment}</p>
+                        {auth?.user?.role === 1 ? (
+                          <button
+                            className='btn btn-danger'
+                            onClick={() => handleDeleteReviews(curReview._id)}
+                          >
+                            delete
+                          </button>
+                        ) : (
+                          ''
+                        )}
+                      </div>
+                    );
+                  })}
+                </>
+              ) : (
+                <p>No Review Found</p>
+              )}
             </div>
           </div>
 
@@ -214,6 +331,28 @@ const Wrapper = styled.section`
       color: #444;
       text-transform: capitalize;
     }
+    .review-wrap {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      .star-style {
+        .icon {
+          width: 2rem;
+          height: 2rem;
+          margin-right: 0.5rem;
+        }
+        .icon-outline {
+          width: 2.3rem;
+          height: 2.3rem;
+        }
+      }
+      .totalReviews {
+        margin-left: 10px;
+        font-size: 16px;
+        font-weight: 500;
+      }
+    }
+
     .price-section {
       display: flex;
       justify-content: start;
@@ -252,6 +391,15 @@ const Wrapper = styled.section`
     }
     .count-amount {
       width: 100px;
+    }
+  }
+  .form-wrap {
+    max-width: 700px;
+    margin: auto;
+    background: #000;
+    padding: 20px;
+    .form {
+      border-radius: 5px;
     }
   }
 `;

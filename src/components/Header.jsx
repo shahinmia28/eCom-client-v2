@@ -15,16 +15,15 @@ const Header = () => {
   cart.map((item) => {
     total_item = total_item + item.amount;
   });
-
+  let logo = 'images/logo.png';
+  let logoOnline =
+    'https://res.cloudinary.com/dopxkndjf/image/upload/v1708077516/ra2aga1m0two1l79ifyn.png';
   return (
     <Wrapper>
       <nav className='navbar navbar-expand navbar-light bg-light'>
         <div className='container'>
           <Link to={'/'} className='navbar-brand'>
-            <img
-              src='https://res.cloudinary.com/dopxkndjf/image/upload/v1707557686/uoqsozfkkfczyxdzmq6h.png'
-              alt='logo'
-            />
+            <img src={logoOnline || logo} alt='logo' />
           </Link>
           <ul className='navbar-nav ms-auto'>
             {!auth.user ? (
@@ -37,15 +36,6 @@ const Header = () => {
               </>
             ) : (
               <>
-                <li className='nav-item'>
-                  {auth?.user?.role === 0 ? (
-                    <NavLink to={`/dashboard/user/orders`} className='nav-link'>
-                      <h6>Orders</h6>
-                    </NavLink>
-                  ) : (
-                    ''
-                  )}
-                </li>
                 <li className='nav-item'>
                   <NavLink
                     to={`/dashboard/${
@@ -81,7 +71,7 @@ const Wrapper = styled.section`
     width: 100%;
     .navbar-brand {
       img {
-        width: 120px;
+        width: 200px;
         height: 100%;
       }
     }
@@ -91,20 +81,12 @@ const Wrapper = styled.section`
         padding: 0;
         margin: auto 2px;
         .nav-link {
-          h6 {
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 15px;
-            margin: auto;
-            text-transform: uppercase;
-          }
           .icon {
             font-size: 35px;
             padding: 7px;
             border-radius: 50%;
           }
           &.active {
-            color: #ff9736;
             .profile-icon {
               color: #ffe6cf;
               background: #ffae63;
@@ -144,7 +126,7 @@ const Wrapper = styled.section`
     .navbar {
       .navbar-brand {
         img {
-          width: 100px;
+          width: 150px;
         }
       }
       .navbar-nav {

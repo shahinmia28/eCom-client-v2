@@ -4,14 +4,26 @@ import ProductPrice from '../ProductPrice';
 import { useCartContext } from '../../context/cartContext';
 import { LiaCartPlusSolid } from 'react-icons/lia';
 import toast from 'react-hot-toast';
+import Star from '../Star';
 
 const ProductCard = ({ p }) => {
   // console.log(p);
   const { addToCart } = useCartContext();
   const navigate = useNavigate();
 
+  let totalRating;
+
+  if (p?.reviews?.length !== 0) {
+    totalRating = p?.reviews
+      ?.map((curElem) => curElem.rating)
+      .reduce((a, b) => a + b);
+  }
+
+  const totalReviews = p?.reviews?.length;
+  const stars = totalRating / totalReviews;
+
   return (
-    <Wrapper className='card'>
+    <Wrapper className='card' data-aos='flip-left'>
       <NavLink to={`/product-details/${p.slug}`} className='navLink-cart'>
         <div className='card-img'>
           <img src={p.images[0].url} alt={p.name} />
@@ -23,6 +35,10 @@ const ProductCard = ({ p }) => {
             discount={p.discount}
             sell_price={p.sell_price}
           />
+          <div className='review-wrap'>
+            <Star stars={stars} />
+            <span className='totalReviews'>({totalReviews} Reviews)</span>
+          </div>
           {/* <p className='title'>{p.name.substring(0, 50)}</p> */}
           <p className='card-title'>{p.name}</p>
         </div>
@@ -52,6 +68,7 @@ const ProductCard = ({ p }) => {
     </Wrapper>
   );
 };
+
 const Wrapper = styled.div`
   margin: 10px 5px;
   padding: 10px;
@@ -89,6 +106,27 @@ const Wrapper = styled.div`
         font-size: 16px;
         font-weight: 500;
         text-transform: capitalize;
+      }
+      .review-wrap {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        .star-style {
+          .icon {
+            width: 14px;
+            height: 14px;
+            margin-right: 3px;
+          }
+          .icon-outline {
+            width: 16px;
+            height: 16px;
+          }
+        }
+        .totalReviews {
+          margin-left: 5px;
+          font-size: 14px;
+          font-weight: 500;
+        }
       }
     }
   }

@@ -11,6 +11,7 @@ import ProductPrice from '../../components/ProductPrice';
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [auth] = useAuth();
+  console.log(orders);
   const getOrders = async () => {
     try {
       const { data } = await axios.get(`${API}/api/auth/orders`);
