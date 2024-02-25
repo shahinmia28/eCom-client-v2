@@ -10,6 +10,8 @@ import ProductPrice from '../components/ProductPrice';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/authContext';
 import Star from '../components/Star';
+import { RxCross2 } from 'react-icons/rx';
+import { FaStar } from 'react-icons/fa';
 
 const ProductDetails = () => {
   const [auth] = useAuth();
@@ -19,8 +21,11 @@ const ProductDetails = () => {
   const [mainImg, setMainImg] = useState('');
   const { addToCart } = useCartContext();
   const [amount, setAmount] = useState(1);
-  const [rating, setRating] = useState('');
   const [comment, setComment] = useState('');
+  const [more, setMore] = useState(false);
+
+  const [rating, setRating] = useState(null);
+  const [hover, setHover] = useState(null);
 
   const setDecrement = () => {
     amount > 1 ? setAmount(amount - 1) : setAmount(1);
@@ -63,6 +68,7 @@ const ProductDetails = () => {
       `${API}/api/product/review/${product._id}`,
       {
         user: auth.user.name,
+        user_email: auth.user.email,
         rating,
         comment,
       }
@@ -81,7 +87,7 @@ const ProductDetails = () => {
   }
 
   const totalReviews = product?.reviews?.length;
-  const stars = totalRating / totalReviews;
+  let stars = totalRating / totalReviews;
 
   // delete review only for admin
 
@@ -133,14 +139,20 @@ const ProductDetails = () => {
             <div className='col-md-6 product-info'>
               <h3 className='title'> {product?.name}</h3>
               <div className='review-wrap'>
+                <span className='rating'>
+                  {totalReviews !== 0
+                    ? stars - Math.floor(stars) === 0
+                      ? stars + '.00'
+                      : stars.toString().slice(0, 4)
+                    : '0.00'}
+                </span>
                 <Star stars={stars} />
-                <span className='totalReviews'>
-                  ({totalReviews} customer reviews)
+                <span className='totalReviews text-muted'>
+                  ({totalReviews})
                 </span>
               </div>
 
               <div className='price-section'>
-                <h6 className='price-title'>Deal Of The Day: </h6>
                 <ProductPrice
                   price={product?.price}
                   discount={product?.discount}
@@ -149,26 +161,40 @@ const ProductDetails = () => {
               </div>
 
               <hr />
-              <p className='text-muted'>{product?.description}</p>
-              <h6 className='category'>
+              <p className='text-muted'>
+                {!more
+                  ? product?.description?.substring(0, 150)
+                  : product?.description}{' '}
+                <span
+                  onClick={() => {
+                    setMore(!more);
+                  }}
+                  className='more'
+                >
+                  {!more ? 'show more...' : 'show less'}
+                </span>
+              </p>
+              {/* <h6 className='category'>
                 Category : <span>{product?.category?.name}</span>
-              </h6>
+              </h6> */}
               <h6 className='color'>
-                Color : <span>{product?.color}</span>
+                {/* Color : <span>{product?.color}</span> */}
               </h6>
-              <div className='price-total'>
-                <p>৳{product?.sell_price}</p>
-                <p>x</p>
-                <p>{amount}</p>
-                <p>=</p>
-                <p className='t-price'>৳{product?.sell_price * amount}</p>
-              </div>
-              <div className='count-amount'>
-                <Amount
-                  amount={amount}
-                  setDecrement={setDecrement}
-                  setIncrement={setIncrement}
-                />
+              <div className='count-price-section d-flex justify-content-between align-items-center'>
+                <div className='count-amount'>
+                  <Amount
+                    amount={amount}
+                    setDecrement={setDecrement}
+                    setIncrement={setIncrement}
+                  />
+                </div>
+                <div className='price-total'>
+                  <p>৳{product?.sell_price}</p>
+                  <p>x</p>
+                  <p>{amount}</p>
+                  <p>=</p>
+                  <p className='t-price'>৳{product?.sell_price * amount}</p>
+                </div>
               </div>
 
               <hr />
@@ -198,74 +224,128 @@ const ProductDetails = () => {
             </div>
           </div>
           <hr />
-          {/* rete this product section */}
-          <div className='review'>
-            <div className='container'>
-              <div className='form-wrap '>
-                <form className='form p-3 m-3 bg-info'>
-                  <h3>Review Product</h3>
-                  <input
-                    type='number'
-                    className='form-control my-3'
-                    placeholder='Rate the product'
-                    onChange={(e) => setRating(e.target.value)}
-                  />
-                  <textarea
-                    name='review'
-                    rows='5'
-                    className='form-control my-3'
-                    placeholder='Write Review'
-                    onChange={(e) => setComment(e.target.value)}
-                  ></textarea>
-                  <button
-                    type='submit'
-                    className='btn btn-light'
-                    onClick={(e) => handleReview(e)}
-                  >
-                    Submit
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
+
           {/* Show review section */}
-          <div className='show-review'>
-            <div className='wrap'>
-              {product?.reviews?.length !== 0 ? (
-                <>
-                  {product?.reviews?.map((curReview, i) => {
-                    return (
-                      <div key={i} className='review-section card my-2 p-3'>
-                        <h6 className='user'>User Name: {curReview.user}</h6>
-                        <div className='rating d-flex align-items-center'>
-                          <span className='r-t me-2'>Rating: </span>
-                          <Star stars={curReview.rating} />
-                        </div>
-                        <p className='comment'>Comment: {curReview.comment}</p>
-                        {auth?.user?.role === 1 ? (
-                          <button
-                            className='btn btn-danger'
-                            onClick={() => handleDeleteReviews(curReview._id)}
-                          >
-                            delete
-                          </button>
-                        ) : (
-                          ''
+          <div className='show-review my-4'>
+            <h4 className='review-title'>
+              Total <span>({totalReviews})</span> Review for{' '}
+              <span>({product?.name}) :</span>
+            </h4>
+            {totalReviews !== 0 ? (
+              product?.reviews?.map((review, i) => {
+                return (
+                  <div key={i} className='review-card card my-2 p-3'>
+                    <div className='user-img'>
+                      <img src='/images/user.png' alt='user.default' />
+                    </div>
+                    <div className='review-info'>
+                      <span className='delete-button'>
+                        {auth?.user?.role === 1 && (
+                          <RxCross2
+                            className='btn btn-outline-danger'
+                            onClick={() => handleDeleteReviews(review._id)}
+                          />
                         )}
+                      </span>
+                      <h6 className='user'>
+                        <span className='fw-bold'>User:</span> {review.user}
+                      </h6>
+                      <div className='rating d-flex align-items-center'>
+                        <span className='fw-bold me-2'>Rating: </span>
+                        <Star stars={review.rating} />
                       </div>
-                    );
-                  })}
-                </>
-              ) : (
-                <p>No Review Found</p>
-              )}
-            </div>
+                      <p className='comment'>
+                        <span className='fw-bold'>Comment: </span>
+                        {review.comment}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <p>No Review Found</p>
+            )}
           </div>
 
-          <hr />
+          {/* rete this product section */}
+          <div className='review-form my-5'>
+            <form className='form p-3' onSubmit={(e) => handleReview(e)}>
+              <h4 className='review-title'>Add Your Review:</h4>
+
+              {/* star icon ratting */}
+              <div className='star-rating-creator'>
+                <span className='rating-title'>
+                  <span className='text-danger fs-4'>*</span> Your Rating:
+                </span>
+                <span>
+                  {[...Array(5)].map((star, index) => {
+                    const currentRating = index + 1;
+                    return (
+                      <label>
+                        <input
+                          type='radio'
+                          name='rating'
+                          value={currentRating}
+                          onClick={() => setRating(currentRating)}
+                          required
+                        />
+                        <FaStar
+                          size={20}
+                          color={
+                            currentRating <= (hover || rating)
+                              ? '#ffbb00'
+                              : '#777'
+                          }
+                          onMouseEnter={() => setHover(currentRating)}
+                          onMouseLeave={() => setHover(null)}
+                          className='star'
+                        />
+                      </label>
+                    );
+                  })}
+                </span>
+              </div>
+
+              <label htmlFor='review' className='form-label'>
+                <span className='text-danger fs-4'>*</span> Write Your Comments:
+              </label>
+              <textarea
+                name='review'
+                rows='5'
+                className='form-control'
+                placeholder={`This ${product?.name} ...`}
+                onChange={(e) => setComment(e.target.value)}
+                required
+              ></textarea>
+
+              <button
+                type='submit'
+                className={
+                  auth?.user ? `order-btn my-3` : `btn btn-outline-dark my-3`
+                }
+                disabled={auth?.user ? false : true}
+              >
+                Submit
+              </button>
+
+              {auth?.user ? (
+                ''
+              ) : (
+                <>
+                  <br />
+
+                  <span className='text-danger'>
+                    (* You have to login for submitting Review)
+                  </span>
+                </>
+              )}
+            </form>
+          </div>
+
           <div className='similar-products'>
             <div>
-              <h4>Similar Products ➡️</h4>
+              <h4>Similar Products:</h4>
+              <hr />
               {relatedProducts.length < 1 && (
                 <p className='text-center'>No Similar Products found</p>
               )}
@@ -331,19 +411,28 @@ const Wrapper = styled.section`
       color: #444;
       text-transform: capitalize;
     }
+    .more {
+      color: #f68821;
+      cursor: pointer;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
     .review-wrap {
+      max-width: fit-content;
       display: flex;
       align-items: center;
       margin-bottom: 10px;
+      .rating {
+        font-weight: bold;
+        font-size: 22px;
+        margin-right: 5px;
+      }
       .star-style {
-        .icon {
-          width: 2rem;
-          height: 2rem;
-          margin-right: 0.5rem;
-        }
+        font-size: 25px;
+
         .icon-outline {
-          width: 2.3rem;
-          height: 2.3rem;
+          font-size: 27px;
         }
       }
       .totalReviews {
@@ -354,15 +443,7 @@ const Wrapper = styled.section`
     }
 
     .price-section {
-      display: flex;
-      justify-content: start;
-      align-items: center;
-      .price-title {
-        font-weight: 600;
-        font-size: 20px;
-        color: #f68821;
-        margin-right: 5px;
-      }
+      max-width: fit-content;
     }
     .category {
       text-transform: capitalize;
@@ -389,17 +470,74 @@ const Wrapper = styled.section`
         color: red;
       }
     }
-    .count-amount {
-      width: 100px;
-    }
   }
-  .form-wrap {
-    max-width: 700px;
-    margin: auto;
-    background: #000;
-    padding: 20px;
+  .review-form {
     .form {
       border-radius: 5px;
+      border: 1px solid #f68821;
+      .star-rating-creator {
+        display: flex;
+        align-items: center;
+        justify-content: start;
+        .rating-title {
+          font-size: 15px;
+          margin-right: 10px;
+          font-weight: 400;
+          color: #444;
+        }
+        input {
+          display: none;
+        }
+
+        .star {
+          margin-bottom: 1px;
+          cursor: pointer;
+        }
+      }
+      .form-label {
+        font-size: 15px;
+        font-weight: 400;
+        color: #444;
+      }
+      .order-btn {
+        border-radius: 5px;
+      }
+    }
+  }
+  .show-review {
+    .review-title {
+      text-transform: capitalize;
+      margin: 15px 0;
+      font-size: 20px;
+      color: #444;
+    }
+    .review-card {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      .user-img {
+        width: fit-content;
+        margin-right: 10px;
+        img {
+          width: 80px;
+          border-radius: 100%;
+        }
+      }
+      .review-info {
+        width: fit-content;
+        .delete-button {
+          position: absolute;
+          right: 10px;
+          top: 10px;
+          .btn {
+            border: none;
+            padding: 5px;
+            font-size: 25px;
+          }
+        }
+      }
     }
   }
 `;

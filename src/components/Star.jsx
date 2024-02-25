@@ -25,18 +25,15 @@ const Star = ({ stars }) => {
 
 const Wrapper = styled.span`
   display: flex;
-  padding: 0.5rem 0;
+  padding: 5px 0;
   .star-style {
     color: #ffbb00;
-    /* .icon {
-      width: 2rem;
-      height: 2rem;
-      margin-right: 0.5rem;
-    }*/
-    /* .icon-outline {
-      width: 2.3rem;
-      height: 2.3rem;
-    } */
+    line-height: 0.9;
+    margin-right: 3px;
+    .icon-outline {
+      color: #333;
+      margin-bottom: -2px;
+    }
   }
 `;
 

@@ -37,9 +37,8 @@ const ProductCard = ({ p }) => {
           />
           <div className='review-wrap'>
             <Star stars={stars} />
-            <span className='totalReviews'>({totalReviews} Reviews)</span>
+            <span className='totalReviews text-muted'>({totalReviews})</span>
           </div>
-          {/* <p className='title'>{p.name.substring(0, 50)}</p> */}
           <p className='card-title'>{p.name}</p>
         </div>
       </NavLink>
@@ -112,20 +111,15 @@ const Wrapper = styled.div`
         align-items: center;
         margin-bottom: 10px;
         .star-style {
-          .icon {
-            width: 14px;
-            height: 14px;
-            margin-right: 3px;
-          }
+          font-size: 13px;
           .icon-outline {
-            width: 16px;
-            height: 16px;
+            font-size: 14px;
           }
         }
         .totalReviews {
           margin-left: 5px;
           font-size: 14px;
-          font-weight: 500;
+          font-weight: 400;
         }
       }
     }

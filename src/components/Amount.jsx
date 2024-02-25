@@ -16,6 +16,7 @@ const Amount = ({ amount, setDecrement, setIncrement }) => {
 };
 
 const Wrapper = styled.div`
+  width: fit-content;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -48,7 +49,6 @@ const Wrapper = styled.div`
     button {
       font-size: 15px;
     }
-
     .amount {
       margin: 0 5px;
       margin-bottom: -3px;
