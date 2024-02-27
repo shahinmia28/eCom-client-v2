@@ -242,14 +242,14 @@ const CreateProduct = () => {
 
                   <div className='col-12 col-md-3'>
                     <label htmlFor='color' className='form-label'>
-                      Color :
+                      Color Picker :
                     </label>
                     <input
-                      type='text'
+                      type='color'
                       name='color'
                       value={product.color}
                       placeholder='Color'
-                      className='form-control'
+                      className='form-control form-control-color'
                       onChange={onChange}
                       required
                     />

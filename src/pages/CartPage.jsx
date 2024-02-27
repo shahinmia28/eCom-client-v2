@@ -188,9 +188,13 @@ const CartPage = () => {
                         </p>
                       </div>
 
-                      <p className='fw-bold color'>
-                        Color: {item?.product?.color}
-                      </p>
+                      <div className='fw-bold color'>
+                        Color:
+                        <div
+                          className='color-bg'
+                          style={{ background: item?.product?.color }}
+                        ></div>
+                      </div>
                       <div className='count-amount'>
                         <Amount
                           amount={item?.amount}
@@ -409,8 +413,16 @@ const Wrapper = styled.section`
           }
         }
         .color {
+          display: flex;
+          align-items: center;
           text-align: start;
-          margin: 0px !important;
+          margin: 5px 0;
+          .color-bg {
+            width: 30px;
+            height: 20px;
+            border-radius: 5px;
+            margin-left: 5px;
+          }
         }
         .count-amount {
           width: 100px;

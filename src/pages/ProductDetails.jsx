@@ -159,27 +159,27 @@ const ProductDetails = () => {
                   sell_price={product?.sell_price}
                 />
               </div>
-
               <hr />
               <p className='text-muted'>
                 {!more
                   ? product?.description?.substring(0, 150)
-                  : product?.description}{' '}
+                  : product?.description}
                 <span
                   onClick={() => {
                     setMore(!more);
                   }}
-                  className='more'
+                  className='more ms-1'
                 >
                   {!more ? 'show more...' : 'show less'}
                 </span>
               </p>
-              {/* <h6 className='category'>
-                Category : <span>{product?.category?.name}</span>
-              </h6> */}
-              <h6 className='color'>
-                {/* Color : <span>{product?.color}</span> */}
-              </h6>
+              <div className='color fw-bold'>
+                Color :
+                <div
+                  className='color-bg'
+                  style={{ background: product?.color }}
+                ></div>
+              </div>
               <div className='count-price-section d-flex justify-content-between align-items-center'>
                 <div className='count-amount'>
                   <Amount
@@ -281,7 +281,7 @@ const ProductDetails = () => {
                   {[...Array(5)].map((star, index) => {
                     const currentRating = index + 1;
                     return (
-                      <label>
+                      <label key={index}>
                         <input
                           type='radio'
                           name='rating'
@@ -327,21 +327,15 @@ const ProductDetails = () => {
               >
                 Submit
               </button>
-
-              {auth?.user ? (
-                ''
-              ) : (
-                <>
-                  <br />
-
-                  <span className='text-danger'>
-                    (* You have to login for submitting Review)
-                  </span>
-                </>
+              <br />
+              {!auth?.user && (
+                <span className='text-danger my-2'>
+                  (* You have to login for submitting Review)
+                </span>
               )}
             </form>
           </div>
-
+          {/* similar product */}
           <div className='similar-products'>
             <div>
               <h4>Similar Products:</h4>
@@ -406,10 +400,21 @@ const Wrapper = styled.section`
     flex-direction: column;
     justify-content: center;
     .title {
-      font-weight: 400;
-      font-size: 30px;
-      color: #444;
-      text-transform: capitalize;
+      font-weight: 500;
+      font-size: 22px;
+      color: #f68821;
+      text-transform: uppercase;
+    }
+    .color {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      .color-bg {
+        margin-left: 5px;
+        width: 30px;
+        height: 30px;
+        border-radius: 100%;
+      }
     }
     .more {
       color: #f68821;

@@ -156,7 +156,13 @@ const AdminOrders = () => {
                                   />
                                 </div>
                                 <div className='d-flex justify-content-between align-items-center fw-bold text-capitalize'>
-                                  <span>color: {p.product.color}</span>
+                                  <div className='color'>
+                                    color:
+                                    <div
+                                      className='color-bg'
+                                      style={{ background: p.product.color }}
+                                    ></div>
+                                  </div>
                                   <span>QTY: {p.amount}</span>
                                 </div>
                               </div>
@@ -212,6 +218,18 @@ const Wrapper = styled.section`
     max-width: fit-content;
     display: flex;
     text-align: start;
+  }
+  .color {
+    display: flex;
+    align-items: center;
+    text-align: start;
+    margin: 5px 0;
+    .color-bg {
+      width: 30px;
+      height: 20px;
+      border-radius: 5px;
+      margin-left: 5px;
+    }
   }
   .cancel-btn {
     width: 100%;

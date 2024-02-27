@@ -6,6 +6,8 @@ import { Modal } from 'antd';
 import { useAuth } from '../context/authContext';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+import { spaceChildren } from 'antd/es/button';
+import { FaCamera } from 'react-icons/fa';
 
 const Profile = () => {
   // update password
@@ -21,31 +23,44 @@ const Profile = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [newEmail, setNewEmail] = useState('');
-
+  const [userImg, setUserImg] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
+  const [photo, setPhoto] = useState('');
 
   //get user data
   useEffect(() => {
-    const { email, name, phone, address } = auth?.user;
+    const { email, name, phone, address, image } = auth?.user;
     setName(name);
     setPhone(phone);
     setEmail(email);
     setAddress(address);
+    setUserImg(image[0]?.url);
   }, [auth?.user]);
 
   // form function
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.put(`${API}/api/auth/profile-update`, {
-        name,
-        email,
-        password,
-        phone,
-        address,
-      });
+      const userData = new FormData();
+      userData.append('name', name);
+      userData.append('phone', phone);
+      userData.append('address', address);
+
+      if (photo) {
+        userData.append('image', photo);
+      }
+
+      const { data } = await axios.put(
+        `${API}/api/auth/profile-update`,
+        userData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
       if (data?.success) {
         setAuth({ ...auth, userData: data?.updatedUser });
         let ls = localStorage.getItem('auth');
@@ -124,10 +139,33 @@ const Profile = () => {
           <div className='card p-4'>
             <div className='form-container'>
               <form>
-                <h4 className='form-title'>Profile</h4>
+                <div className='photo-section'>
+                  <label className='photo-btn'>
+                    {photo ? (
+                      <img src={URL.createObjectURL(photo)} alt='user_photo' />
+                    ) : userImg !== undefined ? (
+                      <img src={userImg} alt='user' />
+                    ) : (
+                      <span>
+                        <FaCamera size={25} />
+                      </span>
+                    )}
+                    <input
+                      type='file'
+                      name='image'
+                      accept='image/*'
+                      onChange={(e) => setPhoto(e.target.files[0])}
+                      hidden
+                      required
+                    />
+                    <span className='camera'>
+                      <FaCamera size={25} />
+                    </span>
+                  </label>
+                </div>
                 <div className='input-item-box'>
                   <label htmlFor='name' className='form-label '>
-                    Full Name:
+                    User Name:
                   </label>
                   <input
                     type='text'
@@ -181,23 +219,13 @@ const Profile = () => {
                   />
                 </div>
               </form>
-
-              <div className='mt-3 d-flex justify-content-between'>
-                <button
-                  type='submit'
-                  onClick={handleSubmit}
-                  className='btn btn-outline-secondary '
-                >
-                  UPDATE
-                </button>
+              <div className='button-container'>
                 <button
                   className='btn btn-outline-secondary'
                   onClick={() => setVisible(true)}
                 >
                   RESET PASSWORD
                 </button>
-              </div>
-              <div className='mt-4 d-flex justify-content-right'>
                 <NavLink
                   to={'/login'}
                   onClick={HandleLogout}
@@ -205,6 +233,15 @@ const Profile = () => {
                 >
                   Logout
                 </NavLink>
+              </div>
+              <div className='mt-4 d-flex justify-content-end'>
+                <button
+                  type='submit'
+                  onClick={handleSubmit}
+                  className='order-btn'
+                >
+                  SAVE
+                </button>
               </div>
               {/* Password Change box */}
 
@@ -319,6 +356,45 @@ const Wrapper = styled.section`
     max-width: 800px;
     .card {
       .form-container {
+        .photo-section {
+          .photo-btn {
+            border: 1px solid #f68821;
+            height: 150px;
+            width: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            padding: 5px;
+            margin: auto;
+            cursor: pointer;
+            transition: all 0.4s linear;
+            border-radius: 100%;
+            overflow: hidden;
+            position: relative;
+            .camera {
+              position: absolute;
+              opacity: 0;
+              transition: all 0.4s linear;
+            }
+            img {
+              border-radius: 100%;
+              width: 100%;
+              height: 100%;
+              opacity: 1;
+              transition: all 0.4s linear;
+            }
+            :hover {
+              background: #ffe1c5;
+              .camera {
+                opacity: 1;
+              }
+              img {
+                opacity: 0.5;
+              }
+            }
+          }
+        }
         .input-item-box {
           display: flex;
           justify-content: start;
@@ -340,6 +416,15 @@ const Wrapper = styled.section`
           .change-email {
             cursor: pointer;
             padding: 5px;
+          }
+        }
+        .button-container {
+          display: flex;
+          flex-direction: column;
+          .btn {
+            margin: 5px 0;
+            text-transform: uppercase;
+            width: 200px;
           }
         }
       }
