@@ -8,11 +8,17 @@ import {
   TbBrandFacebook,
 } from 'react-icons/tb';
 import { BsWhatsapp } from 'react-icons/bs';
+import { useCartContext } from '../context/cartContext';
 const Footer = () => {
   const [auth] = useAuth();
-  let logo = 'images/logo.png';
-  let logoOnline =
-    'https://res.cloudinary.com/dopxkndjf/image/upload/v1708077516/ra2aga1m0two1l79ifyn.png';
+  const { cart } = useCartContext();
+
+  let total_item = 0;
+
+  cart.map((item) => {
+    total_item = total_item + item.amount;
+  });
+
   return (
     <Wrapper id='footer'>
       <div className='container'>
@@ -31,7 +37,7 @@ const Footer = () => {
                       </li>
                       <li className='nav-item'>
                         <NavLink to={'/cart'} className='nav-link'>
-                          Cart
+                          Cart ({total_item})
                         </NavLink>
                       </li>
                       <li className='nav-item'>

@@ -31,7 +31,7 @@ const Wrapper = styled.span`
     line-height: 0.9;
     margin-right: 3px;
     .icon-outline {
-      color: #333;
+      color: #737373;
       margin-bottom: -2px;
     }
   }

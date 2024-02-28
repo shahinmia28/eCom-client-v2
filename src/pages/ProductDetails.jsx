@@ -17,13 +17,18 @@ const ProductDetails = () => {
   const [auth] = useAuth();
   const params = useParams();
   const navigate = useNavigate();
+
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [mainImg, setMainImg] = useState('');
+  const [product, setProduct] = useState({});
+
   const { addToCart } = useCartContext();
+
+  const [mainImg, setMainImg] = useState('');
+
   const [amount, setAmount] = useState(1);
-  const [comment, setComment] = useState('');
   const [more, setMore] = useState(false);
 
+  const [comment, setComment] = useState('');
   const [rating, setRating] = useState(null);
   const [hover, setHover] = useState(null);
 
@@ -36,8 +41,6 @@ const ProductDetails = () => {
       : setAmount(product?.quantity);
   };
 
-  const [product, setProduct] = useState({});
-  // console.log(product);
   //getProduct
   const getProduct = async () => {
     try {
@@ -78,19 +81,44 @@ const ProductDetails = () => {
       getProduct();
     }
   };
-  let totalRating;
 
-  if (product?.reviews?.length !== 0) {
+  let totalRating;
+  const totalReviews = product?.reviews?.length;
+
+  if (totalReviews !== 0) {
     totalRating = product?.reviews
       ?.map((curElem) => curElem.rating)
       .reduce((a, b) => a + b);
   }
 
-  const totalReviews = product?.reviews?.length;
   let stars = totalRating / totalReviews;
 
-  // delete review only for admin
+  const rating5 = [];
+  const rating4 = [];
+  const rating3 = [];
+  const rating2 = [];
+  const rating1 = [];
 
+  if (totalReviews !== 0) {
+    product?.reviews?.map((curElem) => {
+      switch (curElem.rating) {
+        case 5:
+          return rating5.push(curElem.rating);
+        case 4:
+          return rating4.push(curElem.rating);
+        case 3:
+          return rating3.push(curElem.rating);
+        case 2:
+          return rating2.push(curElem.rating);
+        case 1:
+          return rating1.push(curElem.rating);
+      }
+    });
+  }
+
+  // const per = (rating2.length / totalReviews) * 100;
+
+  // delete review only for admin
   const handleDeleteReviews = async (comment_id) => {
     const product_id = product?._id;
     const { data } = await axios.post(`${API}/api/product/delete_review`, {
@@ -119,6 +147,7 @@ const ProductDetails = () => {
     <Wrapper className='mt-1 mt-md-3'>
       {product._id !== undefined ? (
         <div className='container'>
+          {/* Product Details */}
           <div className='row'>
             <div className='col-md-6 image'>
               <div className='main-img-container'>
@@ -223,10 +252,122 @@ const ProductDetails = () => {
               </div>
             </div>
           </div>
-          <hr />
+          {/* rating chart */}
+          <div className='rating-chart my-5'>
+            <h4 className='review-title'>Rating Chart ({totalReviews}) :</h4>
+            <hr />
 
+            <div className='chart-wrap'>
+              <div className='chart chart-5'>
+                <div className='star'>
+                  <Star stars={5} />
+                </div>
+                <div className='percentage'>
+                  <div className='p-back'>
+                    <div
+                      className='p-up'
+                      style={{
+                        width:
+                          totalReviews !== 0
+                            ? `${(rating5.length / totalReviews) * 100}%`
+                            : '0%',
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                <div className='star-count'>
+                  <div>({rating5?.length})</div>
+                </div>
+              </div>
+              <div className='chart chart-5'>
+                <div className='star'>
+                  <Star stars={4} />
+                </div>
+                <div className='percentage'>
+                  <div className='p-back'>
+                    <div
+                      className='p-up'
+                      style={{
+                        width:
+                          totalReviews !== 0
+                            ? `${(rating4.length / totalReviews) * 100}%`
+                            : '0%',
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                <div className='star-count'>
+                  <div>({rating4?.length})</div>
+                </div>
+              </div>
+              <div className='chart chart-5'>
+                <div className='star'>
+                  <Star stars={3} />
+                </div>
+                <div className='percentage'>
+                  <div className='p-back'>
+                    <div
+                      className='p-up'
+                      style={{
+                        width:
+                          totalReviews !== 0
+                            ? `${(rating3.length / totalReviews) * 100}%`
+                            : '0%',
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                <div className='star-count'>
+                  <div>({rating3?.length})</div>
+                </div>
+              </div>
+              <div className='chart chart-5'>
+                <div className='star'>
+                  <Star stars={2} />
+                </div>
+                <div className='percentage'>
+                  <div className='p-back'>
+                    <div
+                      className='p-up'
+                      style={{
+                        width:
+                          totalReviews !== 0
+                            ? `${(rating2.length / totalReviews) * 100}%`
+                            : '0%',
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                <div className='star-count'>
+                  <div>({rating2?.length})</div>
+                </div>
+              </div>
+              <div className='chart chart-5'>
+                <div className='star'>
+                  <Star stars={1} />
+                </div>
+                <div className='percentage'>
+                  <div className='p-back'>
+                    <div
+                      className='p-up'
+                      style={{
+                        width:
+                          totalReviews !== 0
+                            ? `${(rating1.length / totalReviews) * 100}%`
+                            : '0%',
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                <div className='star-count'>
+                  <div>({rating1?.length})</div>
+                </div>
+              </div>
+            </div>
+          </div>
           {/* Show review section */}
-          <div className='show-review my-4'>
+
+          <div className='show-review my-5'>
             <h4 className='review-title'>
               Total <span>({totalReviews})</span> Review for{' '}
               <span>({product?.name}) :</span>
@@ -395,6 +536,7 @@ const Wrapper = styled.section`
       }
     }
   }
+  /* product info */
   .product-info {
     display: flex;
     flex-direction: column;
@@ -476,6 +618,96 @@ const Wrapper = styled.section`
       }
     }
   }
+  .review-title {
+    text-transform: uppercase;
+    margin: 15px 0;
+    font-size: 18px;
+    color: #444;
+  }
+  /* rating chart section */
+  .rating-chart {
+    .chart-wrap {
+      max-width: 660px;
+      margin: auto;
+      .chart {
+        margin: 5px;
+        width: 100%;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        .star {
+          padding: 0;
+          padding-bottom: 3px;
+          width: fit-content;
+          span {
+            margin: 0;
+            .star-style {
+              font-size: 20px;
+              .icon-outline {
+                font-size: 22px;
+              }
+            }
+          }
+        }
+        .percentage {
+          margin: auto;
+          width: 450px;
+          min-width: auto;
+          margin: 0 5px;
+          .p-back {
+            width: 100%;
+            background: #e9e9e9;
+            height: 13px;
+            border-radius: 5px;
+            .p-up {
+              background: #ffbb00;
+              height: 13px;
+              border-radius: 5px;
+            }
+          }
+        }
+        .star-count {
+          width: fit-content;
+          margin: auto;
+          font-weight: bold;
+          color: #6e6e6e;
+          padding-bottom: 3px;
+        }
+      }
+    }
+  }
+  /* show review section */
+  .show-review {
+    .review-card {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      .user-img {
+        width: fit-content;
+        margin-right: 10px;
+        img {
+          width: 80px;
+          border-radius: 100%;
+        }
+      }
+      .review-info {
+        width: fit-content;
+        .delete-button {
+          position: absolute;
+          right: 10px;
+          top: 10px;
+          .btn {
+            border: none;
+            padding: 5px;
+            font-size: 25px;
+          }
+        }
+      }
+    }
+  }
+  /* review form */
   .review-form {
     .form {
       border-radius: 5px;
@@ -506,42 +738,6 @@ const Wrapper = styled.section`
       }
       .order-btn {
         border-radius: 5px;
-      }
-    }
-  }
-  .show-review {
-    .review-title {
-      text-transform: capitalize;
-      margin: 15px 0;
-      font-size: 20px;
-      color: #444;
-    }
-    .review-card {
-      position: relative;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: flex-start;
-      .user-img {
-        width: fit-content;
-        margin-right: 10px;
-        img {
-          width: 80px;
-          border-radius: 100%;
-        }
-      }
-      .review-info {
-        width: fit-content;
-        .delete-button {
-          position: absolute;
-          right: 10px;
-          top: 10px;
-          .btn {
-            border: none;
-            padding: 5px;
-            font-size: 25px;
-          }
-        }
       }
     }
   }

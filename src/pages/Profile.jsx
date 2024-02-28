@@ -19,11 +19,12 @@ const Profile = () => {
 
   //context
   const [auth, setAuth] = useAuth();
+  const [userImg, setUserImg] = useState('');
+
   //state
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [newEmail, setNewEmail] = useState('');
-  const [userImg, setUserImg] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');

@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 const Policy = () => {
   return (
-    <div>
+    <div className='auth'>
       <Helmet>
         <meta charSet='UTF-8' />
         <meta name='description' content={`shahin optical's privacy policy `} />

@@ -8,6 +8,7 @@ import AdminMenu from './AdminMenu';
 import { NavLink } from 'react-router-dom';
 import ProductPrice from '../../components/ProductPrice';
 import styled from 'styled-components';
+import Star from '../../components/Star';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -66,6 +67,16 @@ const Products = () => {
               </>
             ) : (
               products?.map((p, i) => {
+                let totalRating;
+                const totalReviews = p?.reviews?.length;
+
+                if (totalReviews !== 0) {
+                  totalRating = p?.reviews
+                    ?.map((curElem) => curElem.rating)
+                    .reduce((a, b) => a + b);
+                }
+                const stars = totalRating / totalReviews;
+
                 return (
                   <div key={i} className='col-12 col-md-4'>
                     <div className='card'>
@@ -88,6 +99,19 @@ const Products = () => {
                           <p className='card-disc text-muted'>
                             {p?.description.substring(0, 65)}...
                           </p>
+                          <div className='review-wrap'>
+                            <Star stars={stars} />
+                            <span className='totalReviews text-muted'>
+                              ({totalReviews})
+                            </span>
+                          </div>
+                          <div className='color fw-bold'>
+                            Color :
+                            <div
+                              className='color-bg'
+                              style={{ background: p?.color }}
+                            ></div>
+                          </div>
                           <p className='category'>
                             <span className='fw-bold'>Category: </span>
                             <span>{p?.category.name}</span>
@@ -163,7 +187,7 @@ const Wrapper = styled.section`
         }
       }
       .card-body {
-        height: 150px;
+        height: 200px;
         display: flex;
         padding: 0;
         margin: 20px 0;
@@ -180,6 +204,33 @@ const Wrapper = styled.section`
         .card-disc {
           font-size: 14px;
         }
+        .review-wrap {
+          display: flex;
+          align-items: center;
+          margin-bottom: 10px;
+          .star-style {
+            font-size: 13px;
+            .icon-outline {
+              font-size: 14px;
+            }
+          }
+          .totalReviews {
+            margin-left: 5px;
+            font-size: 14px;
+            font-weight: 400;
+          }
+        }
+        .color {
+          display: flex;
+          justify-content: flex-start;
+          align-items: center;
+          .color-bg {
+            margin-left: 5px;
+            width: 30px;
+            height: 20px;
+            border-radius: 10%;
+          }
+        }
         .category {
           font-size: 14px;
         }
@@ -188,45 +239,3 @@ const Wrapper = styled.section`
   }
 `;
 export default Products;
-
-/* <div className='card'>
-  <div className='card-img'>
-    <img src={p.images[0].url} alt={p.name} />
-  </div>
-  <div className='card-body'>
-    <p className='card-title'>{p.name}</p>
-    <p className='card-text text-muted'>
-      {p?.description.substring(0, 60)}...
-    </p>
-    <div
-      className='price-div'
-      style={{
-        maxWidth: 'fit-content',
-        display: 'flex',
-        textAlign: 'start',
-      }}
-    >
-      <ProductPrice
-        price={p?.price}
-        discount={p?.discount}
-        sell_price={p?.sell_price}
-      />
-    </div>
-  </div>
-  <div className='card-btn'>
-    <button
-      className='btn btn-outline-primary'
-      onClick={() => handleClick(p.slug)}
-    >
-      Edit
-    </button>
-    <button
-      className='btn btn-outline-danger'
-      onClick={() => {
-        handleDelete(p._id);
-      }}
-    >
-      Delete
-    </button>
-  </div>
-</div> */

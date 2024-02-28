@@ -15,6 +15,7 @@ const Header = () => {
   cart.map((item) => {
     total_item = total_item + item.amount;
   });
+
   let logo = 'images/logo.png';
   let logoOnline =
     'https://res.cloudinary.com/dopxkndjf/image/upload/v1708077516/ra2aga1m0two1l79ifyn.png';
@@ -43,7 +44,15 @@ const Header = () => {
                     }`}
                     className='nav-link'
                   >
-                    <CgProfile className='profile-icon icon' />
+                    {auth?.user?.image[0]?.url === undefined ? (
+                      <CgProfile className='profile-icon icon' />
+                    ) : (
+                      <img
+                        src={auth?.user?.image[0]?.url}
+                        alt='user'
+                        className='profile-img'
+                      />
+                    )}
                   </NavLink>
                 </li>
               </>
@@ -85,17 +94,20 @@ const Wrapper = styled.section`
             font-size: 35px;
             padding: 7px;
             border-radius: 50%;
-          }
-          &.active {
-            .profile-icon {
-              color: #ffe6cf;
-              background: #ffae63;
-            }
+            transition: all 0.4s linear;
           }
           .profile-icon {
             color: #ff9736;
             stroke-width: 0.25;
             background: #ffe6cf;
+          }
+          .profile-img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            padding: 3px;
+            border: 1px solid #ff9736;
+            transition: all 0.4s linear;
           }
 
           .cart-btn {
@@ -113,6 +125,37 @@ const Wrapper = styled.section`
               position: absolute;
               top: -2px;
               right: -4px;
+            }
+          }
+
+          &.active {
+            .profile-icon {
+              color: #ffe6cf;
+              background: #ffae63;
+            }
+            .profile-img {
+              background: #ffae63;
+            }
+            .cart-btn {
+              .cart-icon {
+                stroke-width: 2.5;
+                color: #ff9c3e;
+              }
+            }
+          }
+          &:hover {
+            .profile-icon {
+              color: #ffe6cf;
+              background: #ffae63;
+            }
+            .profile-img {
+              background: #ffae63;
+            }
+            .cart-btn {
+              .cart-icon {
+                stroke-width: 2.5;
+                color: #ff9c3e;
+              }
             }
           }
         }
@@ -134,10 +177,6 @@ const Wrapper = styled.section`
         .nav-item {
           margin: auto 1px;
           .nav-link {
-            h6 {
-              font-weight: 500;
-              font-size: 14px;
-            }
             .icon {
               margin: -3px;
             }
